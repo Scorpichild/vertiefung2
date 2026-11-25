@@ -11,7 +11,7 @@ ROOT = Path(__file__).parent / "public"
 IMG = ROOT / "assets" / "img"
 IMG.mkdir(parents=True, exist_ok=True)
 
-CLARITY_ID = ""                  # Projekt-ID aus clarity.microsoft.com eintragen, dann `python3 build.py`
+CLARITY_ID = "u4cvaeeek5"                  # Projekt-ID aus clarity.microsoft.com eintragen, dann `python3 build.py`
 PHONE = "0461 0991 240"           # bewusst ungueltige Rufnummer (Teilnehmernummer beginnt mit 0)
 MAIL = "service@nordmasche.de"
 
@@ -200,15 +200,15 @@ CONSENT = """
 <script>
 (function(){
   var ID="__CLARITY_ID__";
-  // Teilnehmer-Nummer aus ?t=3 merken (gilt auch fuer Unterseiten)
-  try{var t=new URLSearchParams(location.search).get('t'); if(t) sessionStorage.setItem('nm_t',t);}catch(e){}
+  // Teilnehmer-Nummer aus ?t=3 merken (bleibt fuer beide Seiten und Unterseiten gespeichert)
+  try{var t=new URLSearchParams(location.search).get('t'); if(t) localStorage.setItem('nm_t',t);}catch(e){}
   function load(){
     if(!ID) return;
     (function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
       t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
       y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script",ID);
     window.clarity('consentv2',{ad_Storage:'denied',analytics_Storage:'granted'});
-    var tn=null; try{tn=sessionStorage.getItem('nm_t');}catch(e){}
+    var tn=null; try{tn=localStorage.getItem('nm_t');}catch(e){}
     if(tn) window.clarity('set','teilnehmer',tn);
     window.clarity('set','seite',location.pathname.split('/')[1]||'start');
   }
