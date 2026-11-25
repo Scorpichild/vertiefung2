@@ -20,3 +20,5 @@ Bilder: `public/assets/img/bild-1.jpg` (bzw. .webp/.png) ersetzt `bild-1.svg` �
 - bild-1 … bild-4: Galerie (auf beiden Seiten identisch)
 - kunde-1, kunde-2: Kundenfotos in den Bewertungen (nur Seite 1)
 - team: Teamfoto auf „Über uns“ (nur Seite 1)
+
+Zahlungslogos (`public/assets/pay/`): aus dem npm-Paket `payment-icons` (MPL-2.0).

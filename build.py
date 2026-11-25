@@ -57,25 +57,53 @@ I = {
 
 
 def stars(v):
-    full = int(round(v))
-    return f'<span class="stars">{"★" * full}<span class="off">{"★" * (5 - full)}</span></span>'
+    pct = max(0, min(100, v / 5 * 100))
+    return (f'<span class="stars" aria-label="{str(v).replace(".", ",")} von 5 Sternen">'
+            f'<span class="off">★★★★★</span><span class="on" style="width:{pct:.0f}%">★★★★★</span></span>')
+
+
+def rating_block(score, count, dist):
+    """Gleiches Bewertungsmodul fuer beide Seiten. dist = Anzahl fuer 5..1 Sterne."""
+    total = sum(dist)
+    rows = "".join(
+        f'<div><span>{n} {"Stern" if n == 1 else "Sterne"}</span><span class="bar"><span style="width:{(c / total * 100) if total else 0:.0f}%"></span></span><span>{c}</span></div>'
+        for n, c in zip([5, 4, 3, 2, 1], dist))
+    word = "Bewertung" if count == 1 else "Bewertungen"
+    return (f'<div class="reviews-head"><div><div class="score">{str(score).replace(".", ",")}</div>{stars(score)}'
+            f'<div style="font-size:14px;color:var(--muted);margin-top:6px">aus {count} {word}</div></div>'
+            f'<div class="dist">{rows}</div></div>')
+
+
+PAY_LOGOS = {"PayPal": ["paypal"], "Kreditkarte": ["mastercard", "visa"]}
+
+
+def pay_html(methods):
+    out = []
+    for m in methods:
+        if m in PAY_LOGOS:
+            out += [f'<img class="paylogo" src="/assets/pay/{f}.svg" alt="{f.capitalize()}">' for f in PAY_LOGOS[m]]
+        else:
+            out.append(f'<span class="paytext">{m}</span>')
+    return "".join(out)
 
 
 # ---------------------------------------------------------------- Bewertungen
-REVIEWS_A = [
+REVIEWS_A = [   # Durchschnitt 3,6 aus 128 – gemischtes Bild
     dict(name="Julia K.", meta="Größe M · 1,68 m", date="12.10.2026", s=5, title="Kratzt kein bisschen",
          text="Ich bin bei Wolle empfindlich, aber den kann ich direkt auf der Haut tragen. Farbe wie auf den Fotos.", photo="kunde-1"),
-    dict(name="Tobias R.", meta="Größe L · 1,86 m", date="28.09.2026", s=5, title="Warm, aber nicht zu dick",
-         text="Passt gut unter die Jacke, im Büro wird mir nicht zu warm. Nach zwei Wäschen noch wie neu.", photo="kunde-2"),
+    dict(name="Tobias R.", meta="Größe L · 1,86 m", date="28.09.2026", s=4, title="Warm, aber nicht zu dick",
+         text="Passt gut unter die Jacke. Nach zwei Wäschen leicht gefusselt, sonst wie neu.", photo="kunde-2"),
     dict(name="Sandra M.", meta="Größe S · 1,72 m", date="03.10.2026", s=3, title="Schöne Qualität, Passform eher kurz",
-         text="Material ist top. Für meine Größe ist er am Bauch etwas kurz, die Ärmel dafür lang. Würde eine Größe größer nehmen.", photo=None),
-    dict(name="Daniel H.", meta="Größe M · 1,79 m", date="17.09.2026", s=4, title="Guter Pullover",
-         text="Sitzt gut, Lieferung kam nach zwei Tagen. Einen Stern Abzug, weil der Kragen anfangs etwas eng war.", photo=None),
+         text="Material ist gut. Für meine Größe ist er am Bauch etwas kurz, die Ärmel dafür lang. Würde eine Größe größer nehmen.", photo=None),
+    dict(name="Daniel H.", meta="Größe M · 1,79 m", date="17.09.2026", s=2, title="Für den Preis enttäuscht",
+         text="Nach drei Wochen Pilling an den Ärmeln. Die Rücksendung lief aber unkompliziert, Geld war nach ein paar Tagen zurück.", photo=None),
 ]
-REVIEWS_B = [
-    dict(name="Lena", meta="", date="", s=5, title="Super Pulli!", text="Sehr schön!", photo=None),
-    dict(name="Max", meta="", date="", s=5, title="Top", text="Gerne wieder.", photo=None),
-    dict(name="Anna", meta="", date="", s=4, title="Schön", text="Ganz zufrieden.", photo=None),
+REVIEWS_B = [   # Durchschnitt 4,8 aus 5
+    dict(name="Lena", meta="", date="02.11.2026", s=5, title="Super Pulli!", text="Sehr schön und richtig weich.", photo=None),
+    dict(name="Max", meta="", date="29.10.2026", s=5, title="Top", text="Gerne wieder.", photo=None),
+    dict(name="Anna", meta="", date="21.10.2026", s=5, title="Mein neuer Lieblingspulli", text="Passt perfekt.", photo=None),
+    dict(name="Jonas", meta="", date="14.10.2026", s=5, title="Klasse", text="Absolut empfehlenswert!", photo=None),
+    dict(name="Sophie", meta="", date="09.10.2026", s=4, title="Schön", text="Ganz zufrieden.", photo=None),
 ]
 
 
@@ -119,7 +147,7 @@ A_SPEC = """
 VARIANTS = {
     "pullover-1": dict(   # Seite A – starke Signale
         title="Merino-Pullover Lyng",
-        rating=f'{stars(4.6)}<b>4,6</b><a href="#bewertungen">128 Bewertungen</a>',
+        rating=f'{stars(3.6)}<b>3,6</b><a href="#bewertungen">128 Bewertungen</a>',
         price_note="inkl. MwSt., zzgl. 4,90 € Versand · Lieferung in 2–3 Werktagen",
         lead="Klassischer Rundhalspullover aus extrafeiner Merinowolle. Temperaturausgleichend, geruchsneutral und weich genug, um ihn direkt auf der Haut zu tragen.",
         size_link='<a href="#groessen">Größentabelle &amp; Passform</a>',
@@ -131,15 +159,7 @@ VARIANTS = {
         </ul>""",
         pay=["Kauf auf Rechnung", "PayPal", "Kreditkarte", "Lastschrift"],
         details=A_SPEC,
-        reviews_head=f"""<div class="reviews-head">
-          <div><div class="score">4,6</div>{stars(4.6)}<div style="font-size:14px;color:var(--muted);margin-top:6px">aus 128 Bewertungen</div></div>
-          <div class="dist">
-            <div><span>5 Sterne</span><span class="bar"><span style="width:72%"></span></span><span>92</span></div>
-            <div><span>4 Sterne</span><span class="bar"><span style="width:19%"></span></span><span>24</span></div>
-            <div><span>3 Sterne</span><span class="bar"><span style="width:6%"></span></span><span>8</span></div>
-            <div><span>2 Sterne</span><span class="bar"><span style="width:2%"></span></span><span>3</span></div>
-            <div><span>1 Stern</span><span class="bar"><span style="width:1%"></span></span><span>1</span></div>
-          </div></div>""",
+        reviews_head=rating_block(3.6, 128, [42, 30, 26, 18, 12]),
         reviews="".join(review_html(r, True) for r in REVIEWS_A) + '<a class="more" href="#bewertungen">Alle 128 Bewertungen anzeigen</a>',
         reviews_title="Bewertungen",
         footer_about='<p style="color:var(--muted);margin:14px 0">Merino-Strick aus Flensburg.</p><a href="#" aria-label="Instagram">Instagram @nordmasche</a>',
@@ -150,7 +170,7 @@ VARIANTS = {
     ),
     "pullover-2": dict(   # Seite B – schwache Signale
         title="Merino-Pullover Lyng",
-        rating=f'{stars(4.7)}<a href="#bewertungen">3 Bewertungen</a>',
+        rating=f'{stars(4.8)}<b>4,8</b><a href="#bewertungen">5 Bewertungen</a>',
         price_note="",
         lead="Unser Lieblingspullover für die kalte Jahreszeit. Weich, warm und einfach zeitlos schön.",
         size_link="",
@@ -158,9 +178,9 @@ VARIANTS = {
         usp="",
         pay=["Vorkasse", "Kreditkarte"],
         details="",
-        reviews_head="",
+        reviews_head=rating_block(4.8, 5, [4, 1, 0, 0, 0]),
         reviews="".join(review_html(r, False) for r in REVIEWS_B),
-        reviews_title="Bewertungen (3)",
+        reviews_title="Bewertungen",
         footer_about="",
         footer_cols=f"""
           <div><h4>Kontakt</h4><ul><li>{MAIL}</li></ul></div>
@@ -252,7 +272,7 @@ def pdp(slug, v):
         f'<div class="thumb{" active" if i == 0 else ""}" data-src="{img(n)}"><img src="{img(n)}" alt="{a}"></div>'
         for i, (n, a) in enumerate(gallery))
     sizes = "".join(f'<button class="size">{s}</button>' for s in ["XS", "S", "M", "L", "XL"])
-    chips = "".join(f'<span class="chip">{c}</span>' for c in v["pay"])
+    chips = pay_html(v["pay"])
     price_note = f'<div class="price-note">{v["price_note"]}</div>' if v["price_note"] else ""
     return HEAD.format(title=v["title"]) + f"""
 <main class="wrap">
