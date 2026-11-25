@@ -8,6 +8,8 @@ Bilder austauschen: Datei mit gleichem Namen als .jpg/.webp/.png nach public/ass
 from pathlib import Path
 
 ROOT = Path(__file__).parent / "public"
+import hashlib
+ASSET_V = hashlib.sha1(b"".join(f.read_bytes() for f in sorted((ROOT / "assets").rglob("*")) if f.is_file())).hexdigest()[:8]
 IMG = ROOT / "assets" / "img"
 IMG.mkdir(parents=True, exist_ok=True)
 
@@ -56,10 +58,21 @@ I = {
 }
 
 
-def stars(v):
-    pct = max(0, min(100, v / 5 * 100))
-    return (f'<span class="stars" aria-label="{str(v).replace(".", ",")} von 5 Sternen">'
-            f'<span class="off">★★★★★</span><span class="on" style="width:{pct:.0f}%">★★★★★</span></span>')
+STAR = "M10 1.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L10 14.8l-5.2 2.8 1-5.8L1.5 7.7l5.9-.9z"
+_star_id = [0]
+
+
+def stars(v, size=16):
+    """Sterne als SVG mit anteiliger Fuellung – unabhaengig vom Stylesheet."""
+    _star_id[0] += 1
+    cid = f"st{_star_id[0]}"
+    w = size * 5 + 8
+    paths = "".join(f'<path transform="translate({i * (size + 2)} 0) scale({size / 20})" d="{STAR}"/>' for i in range(5))
+    fill_w = w * max(0.0, min(1.0, v / 5))
+    label = str(v).replace(".", ",")
+    return (f'<svg class="stars" width="{w}" height="{size}" viewBox="0 0 {w} {size}" role="img" aria-label="{label} von 5 Sternen">'
+            f'<defs><clipPath id="{cid}"><rect width="{fill_w:.1f}" height="{size}"/></clipPath></defs>'
+            f'<g fill="#D9D2C5">{paths}</g><g fill="#C9A14A" clip-path="url(#{cid})">{paths}</g></svg>')
 
 
 def rating_block(score, count, dist):
@@ -75,13 +88,14 @@ def rating_block(score, count, dist):
 
 
 PAY_LOGOS = {"PayPal": ["paypal"], "Kreditkarte": ["mastercard", "visa"]}
+PAY_NAMES = {"paypal": "PayPal", "mastercard": "Mastercard", "visa": "Visa"}
 
 
 def pay_html(methods):
     out = []
     for m in methods:
         if m in PAY_LOGOS:
-            out += [f'<img class="paylogo" src="/assets/pay/{f}.svg" alt="{f.capitalize()}">' for f in PAY_LOGOS[m]]
+            out += [f'<img class="paylogo" src="/assets/pay/{f}.svg?v={ASSET_V}" alt="{PAY_NAMES[f]}" width="47" height="30">' for f in PAY_LOGOS[m]]
         else:
             out.append(f'<span class="paytext">{m}</span>')
     return "".join(out)
@@ -195,7 +209,7 @@ HEAD = """<!DOCTYPE html>
 <meta charset="utf-8"><meta name="robots" content="noindex, nofollow">
 <title>{title} – Nordmasche</title>
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/assets/shop.css">
+<link rel="stylesheet" href="/assets/shop.css?v={asset_v}">
 </head><body>
 <div class="topbar">Die neue Herbstkollektion ist da</div>
 <header class="site"><div class="wrap">
@@ -274,7 +288,7 @@ def pdp(slug, v):
     sizes = "".join(f'<button class="size">{s}</button>' for s in ["XS", "S", "M", "L", "XL"])
     chips = pay_html(v["pay"])
     price_note = f'<div class="price-note">{v["price_note"]}</div>' if v["price_note"] else ""
-    return HEAD.format(title=v["title"]) + f"""
+    return HEAD.format(title=v["title"], asset_v=ASSET_V) + f"""
 <main class="wrap">
   <div class="crumbs"><a href="#">Startseite</a> / <a href="#">Pullover</a> / {v['title']}</div>
   <div class="pdp">
@@ -315,7 +329,7 @@ def pdp(slug, v):
 
 
 def textpage(v, title, body):
-    return HEAD.format(title=title) + f'<main class="wrap"><div class="page">{body}</div></main>{footer(v)}</body></html>'
+    return HEAD.format(title=title, asset_v=ASSET_V) + f'<main class="wrap"><div class="page">{body}</div></main>{footer(v)}</body></html>'
 
 
 # ---------------------------------------------------------------- Unterseiten
