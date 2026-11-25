@@ -71,6 +71,8 @@ nav.main a:hover{text-decoration:underline;text-underline-offset:4px}
 .btn{flex:1;height:56px;border:0;border-radius:var(--radius);background:var(--ink);color:#fff;font:600 17px "DM Sans",sans-serif;cursor:pointer}
 .btn:hover{background:var(--ink-soft)}
 .btn-ghost{width:56px;height:56px;border:1px solid var(--line);border-radius:var(--radius);background:#fff;display:grid;place-items:center;cursor:pointer}
+.delivery{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:14px;color:var(--ink-soft)}
+.delivery svg{width:18px;height:18px;flex:none}
 .added{font-size:14px;color:var(--ok);margin-top:10px;min-height:20px}
 
 .usp{list-style:none;padding:0;margin:20px 0 0;border-top:1px solid var(--line)}
@@ -81,8 +83,8 @@ nav.main a:hover{text-decoration:underline;text-underline-offset:4px}
 .pay{margin-top:22px}
 .pay .t{font-size:13px;color:var(--muted);margin-bottom:8px}
 .chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.paylogo{display:block;height:30px;width:auto;border-radius:4px;box-shadow:0 0 0 1px var(--line)}
-.paytext{display:inline-flex;align-items:center;height:30px;padding:0 10px;border-radius:4px;background:#fff;box-shadow:0 0 0 1px var(--line);font-size:12px;font-weight:600}
+.paylogo{display:block;height:60px;width:auto;border-radius:4px;box-shadow:0 0 0 1px var(--line)}
+.paytext{display:inline-flex;align-items:center;height:60px;padding:0 16px;border-radius:4px;background:#fff;box-shadow:0 0 0 1px var(--line);font-size:14px;font-weight:600}
 
 /* Details */
 section.block{padding:64px 0 0}
@@ -108,7 +110,7 @@ section.block h2{font-size:30px;margin-bottom:22px}
 .review .who{font-size:14px}
 .review .who b{display:block;font-weight:600}
 .review .who small{color:var(--muted);display:block}
-.verified{color:var(--ok);font-size:13px}
+.verified{display:inline-flex;align-items:center;gap:4px;margin-top:8px;padding:3px 10px;border-radius:999px;background:#E3EFE6;color:var(--ok);font-size:12px;font-weight:600;line-height:1.4}
 .review h3{font-family:"DM Sans",sans-serif;font-weight:600;font-size:16px;margin:6px 0}
 .review p{margin:0;color:var(--ink-soft);font-size:15px}
 .rphoto{width:96px;height:96px;border-radius:8px;background:var(--wool);margin-top:12px;display:grid;place-items:center;overflow:hidden}

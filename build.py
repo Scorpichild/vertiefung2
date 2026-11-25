@@ -95,7 +95,7 @@ def pay_html(methods):
     out = []
     for m in methods:
         if m in PAY_LOGOS:
-            out += [f'<img class="paylogo" src="/assets/pay/{f}.svg?v={ASSET_V}" alt="{PAY_NAMES[f]}" width="47" height="30">' for f in PAY_LOGOS[m]]
+            out += [f'<img class="paylogo" src="/assets/pay/{f}.svg?v={ASSET_V}" alt="{PAY_NAMES[f]}" width="94" height="60">' for f in PAY_LOGOS[m]]
         else:
             out.append(f'<span class="paytext">{m}</span>')
     return "".join(out)
@@ -162,7 +162,8 @@ VARIANTS = {
     "pullover-1": dict(   # Seite A – starke Signale
         title="Merino-Pullover Lyng",
         rating=f'{stars(3.6)}<b>3,6</b><a href="#bewertungen">128 Bewertungen</a>',
-        price_note="inkl. MwSt., zzgl. 4,90 € Versand · Lieferung in 2–3 Werktagen",
+        price_note="inkl. MwSt., zzgl. 4,90 € Versand",
+        delivery="Lieferung in 2–3 Werktagen",
         lead="Klassischer Rundhalspullover aus extrafeiner Merinowolle. Temperaturausgleichend, geruchsneutral und weich genug, um ihn direkt auf der Haut zu tragen.",
         size_link='<a href="#groessen">Größentabelle &amp; Passform</a>',
         stock='<div class="stock">Auf Lager · in allen Größen lieferbar</div>',
@@ -186,6 +187,7 @@ VARIANTS = {
         title="Merino-Pullover Lyng",
         rating=f'{stars(4.8)}<b>4,8</b><a href="#bewertungen">5 Bewertungen</a>',
         price_note="",
+        delivery="",
         lead="Unser Lieblingspullover für die kalte Jahreszeit. Weich, warm und einfach zeitlos schön.",
         size_link="",
         stock="",
@@ -313,6 +315,7 @@ def pdp(slug, v):
       <div class="sizes">{sizes}</div>
       {v['stock']}
       <div class="buy"><button class="btn" id="addbtn">In den Warenkorb</button><button class="btn-ghost" aria-label="Merken">{I['heart']}</button></div>
+      {f'<div class="delivery">{I["truck"]}<span>{v["delivery"]}</span></div>' if v["delivery"] else ""}
       <div class="added" id="added"></div>
       {v['usp']}
       <div class="pay"><div class="t">Bezahlen mit</div><div class="chips">{chips}</div></div>
